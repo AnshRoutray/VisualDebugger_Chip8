@@ -1,0 +1,11 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend Server Connecting a C++ CHIP 8 Emulator and my Visual Debugger hosted in the browser\\",
+  "main": "debug_backend.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anshuman Routray",
+  "license": "ISC"
+}

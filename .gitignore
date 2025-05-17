@@ -1,0 +1,4 @@
+node_modules/
+backend/chip8
+*.o
+.vcscode/
