@@ -1,4 +1,22 @@
-backend/node_modules
+# Node.js
+backend/node_modules/
+package-lock.json
+
+# Build artifacts
 backend/Main.exe
 *.o
-.vcscode/
+*.obj
+*.exe
+
+# IDE
+.vscode/
+*.code-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Debug files
+*.log
+*.pdb
+*.ilk
