@@ -6,27 +6,49 @@ const WebSocket = require('ws');
 
 const server = express()
 const http_server = http.createServer(server)
-const web_server = new WebSocket.createServer({http_server})
+const web_server = new WebSocket.Server({server: http_server})
 
 server.use(express.static(path.join(__dirname, '..', 'public')))
 
 const PORT = 3000;
 http_server.listen(PORT, () => {
-    console.log("Server is no up and Running");
+    console.log("Server is now up and Running");
 })
 
-const emulator = spawn(".\\Main.cpp");
+web_server.on('connection', (stream) => {
+    console.log("Connected Successfully");
 
-emulator.stdout.on('data', (data) => {
-    console.log("Received Data");
-    //Pipe data to WebsSocket
+    const emulator = spawn(path.join(__dirname, '/Main.exe'));
+
+    emulator.stdout.on('data', (data) => {
+        console.log("Received Data from emulator");
+        const output = data.toString();
+
+        //Pipe data to WebsSocket
+
+        stream.send(JSON.stringify({type: 'emulator-data', data: output}))
+    })
+
+    emulator.stderr.on('data', (data) => {
+        console.log("ERROR: " + data);
+    })
+
+    emulator.on('close', (code) => {
+        console.log(`Emulator exited with code ${code}`);
+    })
+
+    stream.on('message', (data) => {
+        try {
+            console.log("Received Data from client through web socket");
+            console.log(JSON.parse(data));
+        }
+        catch(err){
+            console.error("Error in Parsing Data From Client " + err);
+        }
+    })
+
+    stream.on('close', (data) => {
+        console.log("Closing Emulator Process");
+        emulator.kill();
+    })
 })
-
-emulator.stderr.on('data', (data) => {
-    console.log("ERROR: " + data);
-})
-
-emulator.on('close', (code) => {
-    console.log('Emulator exited with code ${code}');
-})
-
