@@ -1,4 +1,4 @@
-backend/node-modules
-backend/chip8
+backend/node_modules
+backend/Main.exe
 *.o
 .vcscode/
