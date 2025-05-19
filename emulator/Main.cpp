@@ -1,6 +1,4 @@
-#define SDL_MAIN_HANDLED 
-
-#include <SDL.h>
+#include <nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
 #include <chrono>
@@ -17,35 +15,9 @@ random_device rd;                          // Seed source
 mt19937 gen(rd());                         // Mersenne Twister RNG
 uniform_int_distribution<> dist(0, 255);
 
-int mapKey(SDL_Keycode key){
-    switch (key) {
-        case SDLK_1: return 0x1; 
-        case SDLK_2: return 0x2;
-        case SDLK_3: return 0x3;
-        case SDLK_4: return 0xC;
-        case SDLK_q: return 0x4;
-        case SDLK_w: return 0x5;
-        case SDLK_e: return 0x6;
-        case SDLK_r: return 0xD;
-        case SDLK_a: return 0x7;
-        case SDLK_s: return 0x8;
-        case SDLK_d: return 0x9;
-        case SDLK_f: return 0xE;
-        case SDLK_z: return 0xA;
-        case SDLK_x: return 0x0;
-        case SDLK_c: return 0xB;
-        case SDLK_v: return 0xF;
-        default: return -1;
-    }
-}
-
 class Chip8 {
     public:
-        Chip8(SDL_Renderer* r) {
-
-            //Initialize Renderer
-
-            renderer = r;
+        Chip8() {
 
             //Initialize the memory with default fontset
 
@@ -273,23 +245,7 @@ class Chip8 {
         }
 
         void drawGraphics() {  
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // clear with black
-            SDL_RenderClear(renderer);
-            for (int j = 0; j < DISPLAY_HEIGHT; j++) {
-                for (int i = 0; i < DISPLAY_WIDTH; i++) {
-                    if (display[j][i]) {
-                        SDL_Rect rect = {
-                            i * SCALE, 
-                            j * SCALE, 
-                            SCALE, 
-                            SCALE
-                        };
-                        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // white pixel
-                        SDL_RenderFillRect(renderer, &rect);
-                    }
-                }
-            }
-            SDL_RenderPresent(renderer);
+            //Send Display Code
         }
 
         const uint8_t fontset[80] = {
@@ -310,7 +266,7 @@ class Chip8 {
             0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
             0xF0, 0x80, 0xF0, 0x80, 0x80  // F
         };
-        SDL_Renderer* renderer;
+
         uint8_t memory[4096]; // 4KB of memory
         bool keypad[16]; //KeyPad
         uint8_t V[16]; // 16 registers
@@ -323,7 +279,7 @@ class Chip8 {
         uint8_t sp; // Stack pointer
 };
 
-int main(int argc, char* argv[]) {
+int main() {
 
     string gamePath = "flightrunner.ch8"; // Path to the game file
     
@@ -333,27 +289,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if(SDL_Init(SDL_INIT_VIDEO) != 0) {
-        cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << endl;
-        return 1;
-    }
-
-    SDL_Window* window = SDL_CreateWindow("CHIP-8 Emulator", 100, 100, 
-        DISPLAY_WIDTH * SCALE, DISPLAY_HEIGHT * SCALE, SDL_WINDOW_SHOWN);
-
-    if(window == NULL) {
-        cout << "Window could not be created! SDL_Error: " << SDL_GetError() << endl;
-        return 1;
-    }
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    if(renderer == NULL) {
-        cout << "Renderer could not be created! SDL_Error: " << SDL_GetError() << endl;
-        return 1;
-    }
-
-    Chip8 emulator(renderer);
+    Chip8 emulator;
 
     // Seek to the end to get the file size
     gameFile.seekg(0, ios::end);
@@ -371,31 +307,12 @@ int main(int argc, char* argv[]) {
 
     bool running = true;
 
-    SDL_Event event;
-
     auto lastTime_instruction = chrono::high_resolution_clock::now();
     auto lastTime_timer = chrono::high_resolution_clock::now();
     float instructionDelay = 1000 / 700.0f;
     float timerDelay = 1000 / 60.0f;
     
     while(running){
-        if(SDL_PollEvent(&event)) {
-            if(event.type == SDL_QUIT) {
-                running = false;
-            }
-            else if (event.type == SDL_KEYDOWN && !event.key.repeat) {
-                uint8_t chip8Key = mapKey(event.key.keysym.sym);
-                if (chip8Key != -1) {
-                    emulator.keypad[chip8Key] = true;
-                }
-            }
-            else if (event.type == SDL_KEYUP) {
-                uint8_t chip8Key = mapKey(event.key.keysym.sym);
-                if (chip8Key != -1) {
-                    emulator.keypad[chip8Key] = false;
-                }
-            }
-        }
 
         auto currentTime = chrono::high_resolution_clock::now();
         chrono::duration<float, milli> deltaTime_instruction = currentTime - lastTime_instruction;
@@ -416,10 +333,6 @@ int main(int argc, char* argv[]) {
             lastTime_timer = currentTime;
         }
     }
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
+    
     return 0;
 }

@@ -18,7 +18,7 @@ http_server.listen(PORT, () => {
 web_server.on('connection', (stream) => {
     console.log("Connected Successfully");
 
-    const emulator = spawn(path.join(__dirname, '/Main.exe'));
+    const emulator = spawn(path.join(__dirname, '/../emulator/Main.exe'));
 
     emulator.stdout.on('data', (data) => {
         console.log("Received Data from emulator");
@@ -40,7 +40,10 @@ web_server.on('connection', (stream) => {
     stream.on('message', (data) => {
         try {
             console.log("Received Data from client through web socket");
-            console.log(JSON.parse(data));
+            received_data = JSON.parse(data);
+            
+            //Send Data to Emulator.
+
         }
         catch(err){
             console.error("Error in Parsing Data From Client " + err);
