@@ -4,6 +4,11 @@
 #include <chrono>
 #include <random>
 #include <cstdint>
+#include <thread>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <atomic>
 
 #define DISPLAY_WIDTH 64
 #define DISPLAY_HEIGHT 32
@@ -14,6 +19,24 @@ using namespace std;
 random_device rd;                          // Seed source
 mt19937 gen(rd());                         // Mersenne Twister RNG
 uniform_int_distribution<> dist(0, 255);
+
+queue<string> inputQueue;
+mutex inputMutex;
+atomic<bool> running = false;
+
+void checkInput(){
+    while(running){
+        string input = "";
+        if(getline(cin, input)){
+            lock_guard<mutex> lock(inputMutex);
+            inputQueue.push(input);
+        }
+        else {
+            cin.clear();
+            this_thread::sleep_for(chrono::milliseconds(5));
+        }
+    }
+}
 
 class Chip8 {
     public:
@@ -305,7 +328,7 @@ int main() {
     uint16_t addr = 0x200;
     uint8_t byte1, byte2;
 
-    bool running = true;
+    running = true;
 
     auto lastTime_instruction = chrono::high_resolution_clock::now();
     auto lastTime_timer = chrono::high_resolution_clock::now();
@@ -313,6 +336,15 @@ int main() {
     float timerDelay = 1000 / 60.0f;
     
     while(running){
+
+        lock_guard<mutex> lock(inputMutex);
+        
+        while(!inputQueue.empty()){
+            string input = inputQueue.front();
+            inputQueue.pop();
+
+            emulator.keypad[stoi(input)] = !emulator.keypad[stoi(input)];
+        }
 
         auto currentTime = chrono::high_resolution_clock::now();
         chrono::duration<float, milli> deltaTime_instruction = currentTime - lastTime_instruction;
