@@ -24,6 +24,8 @@ queue<string> inputQueue;
 mutex inputMutex;
 atomic<bool> running = false;
 
+nlohmann::json output;
+
 void checkInput(){
     while(running){
         string input = "";
@@ -268,7 +270,22 @@ class Chip8 {
         }
 
         void drawGraphics() {  
+
             //Send Display Code
+
+            nlohmann::json display_obj = nlohmann::json::array();
+            for(int i = 0; i < DISPLAY_HEIGHT; i++){
+                nlohmann::json row = nlohmann::json::array();
+                for(int j = 0; j < DISPLAY_WIDTH; j++){
+                    row.push_back(display[i][j]);
+                }
+                display_obj.push_back(row);
+            }
+
+            output["type"] = "display";
+            output["display"] = display_obj;
+
+            cout << output.dump() << endl;
         }
 
         const uint8_t fontset[80] = {
@@ -305,7 +322,9 @@ class Chip8 {
 int main() {
 
     string gamePath = "flightrunner.ch8"; // Path to the game file
-    
+
+    thread inputThread(checkInput);
+
     ifstream gameFile(gamePath, ios::binary);
     if (!gameFile) {
         cout << "Error opening file: " << gamePath << endl;
@@ -365,6 +384,11 @@ int main() {
             lastTime_timer = currentTime;
         }
     }
-    
+
+    //Safe ending of thread
+
+    if(inputThread.joinable()){
+        inputThread.join();
+    }
     return 0;
 }
