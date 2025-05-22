@@ -3,7 +3,6 @@ backend/node_modules/
 package-lock.json
 
 # Build artifacts
-backend/Main.exe
 *.o
 *.obj
 *.exe

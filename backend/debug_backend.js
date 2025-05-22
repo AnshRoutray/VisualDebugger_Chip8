@@ -12,25 +12,23 @@ server.use(express.static(path.join(__dirname, '..', 'public')))
 
 const PORT = 3000;
 http_server.listen(PORT, () => {
-    console.log("Server is now up and Running");
+    console.log("Server is now up and Running on PORT: " + PORT);
 })
 
 web_server.on('connection', (stream) => {
     console.log("Connected Successfully");
 
-    const emulator = spawn(path.join(__dirname, '/../emulator/Main.exe'));
+    const emulator = spawn(path.join(__dirname, '/../emulator/chip8.exe'));
 
     emulator.stdout.on('data', (data) => {
         console.log("Received Data from emulator");
         const output = data.toString();
-
         //Pipe data to WebsSocket
-
-        stream.send(JSON.stringify({type: 'emulator-data', data: output}))
+        stream.send(output);
     })
 
     emulator.stderr.on('data', (data) => {
-        console.log("ERROR: " + data);
+        console.error("ERROR: " + data);
     })
 
     emulator.on('close', (code) => {
@@ -40,9 +38,12 @@ web_server.on('connection', (stream) => {
     stream.on('message', (data) => {
         try {
             console.log("Received Data from client through web socket");
-            received_data = JSON.parse(data);
             
             //Send Data to Emulator.
+
+            emulator.stdin.write(data, () => {
+                console.log("Sending Data to Emulator.");
+            });
 
         }
         catch(err){

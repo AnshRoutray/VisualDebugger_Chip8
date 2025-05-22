@@ -9,6 +9,7 @@
 #include <queue>
 #include <string>
 #include <atomic>
+#include <unistd.h>
 
 #define DISPLAY_WIDTH 64
 #define DISPLAY_HEIGHT 32
@@ -68,6 +69,7 @@ class Chip8 {
         }
 
         void emulateCycle() {
+            
             //Fetching Instruction From Memory
 
             uint16_t opcode = memory[pc] << 8 | memory[pc + 1];
@@ -285,7 +287,7 @@ class Chip8 {
             output["type"] = "display";
             output["display"] = display_obj;
 
-            cout << output.dump() << endl;
+            cout << output.dump() << endl << flush;
         }
 
         const uint8_t fontset[80] = {
@@ -321,17 +323,24 @@ class Chip8 {
 
 int main() {
 
-    string gamePath = "flightrunner.ch8"; // Path to the game file
+    string gamePath = "../emulator/IBM_Logo.ch8"; // Path to the game file
 
     thread inputThread(checkInput);
 
     ifstream gameFile(gamePath, ios::binary);
     if (!gameFile) {
+        char buffer[256];
+        getcwd(buffer, sizeof(buffer));
+        std::cout << "Current working directory: " << buffer << std::endl;
         cout << "Error opening file: " << gamePath << endl;
         return 1;
     }
 
     Chip8 emulator;
+
+    //filling in keypad with zeroes
+
+    fill_n(emulator.keypad, 16, false);
 
     // Seek to the end to get the file size
     gameFile.seekg(0, ios::end);
@@ -361,8 +370,15 @@ int main() {
         while(!inputQueue.empty()){
             string input = inputQueue.front();
             inputQueue.pop();
-
-            emulator.keypad[stoi(input)] = !emulator.keypad[stoi(input)];
+            nlohmann::json input_object;
+            try {
+                input_object = nlohmann::json::parse(input);
+            }
+            catch(nlohmann::json::parse_error& e){
+                cerr << "Parse Error: " << e.what() << endl;
+            }
+            int key = stoi(input_object["letter"].get<string>());
+            emulator.keypad[key] = !emulator.keypad[key];
         }
 
         auto currentTime = chrono::high_resolution_clock::now();

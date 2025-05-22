@@ -1,0 +1,44 @@
+body {
+    background-color: darkblue;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    height: 100vh;    
+}
+
+#title {
+    text-align: center;
+    color: greenyellow;
+}
+
+.container {
+    display: flex;                  /* Use flexbox to align display and button horizontally */
+    justify-content: flex-start;    /* Align items to the start (left) */
+    align-items: center;            /* Center items vertically */
+}
+
+#display {
+    display: grid;
+    grid-template-columns: repeat(64, 10px);
+    grid-template-rows: repeat(32, 10px);
+    gap: 0;
+    width: 640px;
+    height: 320px;
+    margin-right: 20px;  
+    margin-top: 20px;           /* Add space between the display and the button */
+}
+.pixel {
+    width: 10px;
+    height: 10px;
+    background-color: black;
+}
+
+button {
+    padding: 10px;
+    background-color: greenyellow;
+    border: none;
+    color: darkblue;
+    cursor: pointer;
+    position: absolute;             /* Position the button absolutely relative to the container */
+    left: 100px;                    /* 10px from the right edge of the container */
+}
