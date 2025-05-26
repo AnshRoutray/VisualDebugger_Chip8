@@ -86,12 +86,18 @@ class Chip8 {
             switch(ins) {
                 case 0x0:{
                     if(opcode == 0x00E0){
+                        nlohmann::json changedPixels = nlohmann::json::array();
                         for(int i = 0; i < DISPLAY_HEIGHT; i++) {
                             for(int j = 0; j < DISPLAY_WIDTH; j++) {
+                                if(display[i][j]){
+                                string j_s = (j < 10) ? ("0" + to_string(j)) : to_string(j);
+                                string i_s = (i < 10) ? ("0" + to_string(i)) : to_string(i);
+                                changedPixels.push_back(i_s + j_s);
+                                }
                                 display[i][j] = false;
                             }
                         }
-                        drawGraphics();
+                        drawGraphics(changedPixels);
                     }
                     else if(opcode == 0x00EE){
                         pc = stack[sp - 1];
@@ -192,6 +198,7 @@ class Chip8 {
                     uint8_t y_coord = V[y] % 32;
                     uint16_t pointer = I;
                     uint8_t sprite_data;
+                    nlohmann::json changedPixels = nlohmann::json::array();
                     V[0xF] = 0;
                     for(int j = y_coord; j < y_coord + n && j < DISPLAY_HEIGHT; j++){
                         sprite_data = memory[pointer];
@@ -200,11 +207,17 @@ class Chip8 {
                             if(sprite_bit && display[j][x_coord + i]){
                                 V[0xF] = 1;
                             }
+                            if(sprite_bit){
+                                string j_s = (j < 10) ? ("0" + to_string(j)) : to_string(j);
+                                string i_s = (x_coord + i < 10) ? 
+                                    ("0" + to_string(x_coord + i)) : to_string(x_coord + i);
+                                changedPixels.push_back(j_s + i_s);
+                            }
                             display[j][x_coord + i] ^= sprite_bit;
                         }
                         pointer++;
                     }
-                    drawGraphics();
+                    drawGraphics(changedPixels);
                 }
                 break;
                 case 0xE:{
@@ -271,21 +284,18 @@ class Chip8 {
             }
         }
 
-        void drawGraphics() {  
+        void drawGraphics(nlohmann::json changedPixels) {  
 
             //Send Display Code
 
-            nlohmann::json display_obj = nlohmann::json::array();
             for(int i = 0; i < DISPLAY_HEIGHT; i++){
                 nlohmann::json row = nlohmann::json::array();
                 for(int j = 0; j < DISPLAY_WIDTH; j++){
                     row.push_back(display[i][j]);
                 }
-                display_obj.push_back(row);
             }
-
             output["type"] = "display";
-            output["display"] = display_obj;
+            output["display"] = changedPixels;
 
             cout << output.dump() << endl << flush;
         }
@@ -323,9 +333,7 @@ class Chip8 {
 
 int main() {
 
-    string gamePath = "../emulator/IBM_Logo.ch8"; // Path to the game file
-
-    thread inputThread(checkInput);
+    string gamePath = "../emulator/flightrunner.ch8"; // Path to the game file
 
     ifstream gameFile(gamePath, ios::binary);
     if (!gameFile) {
@@ -358,6 +366,8 @@ int main() {
 
     running = true;
 
+    thread inputThread(checkInput);
+
     auto lastTime_instruction = chrono::high_resolution_clock::now();
     auto lastTime_timer = chrono::high_resolution_clock::now();
     float instructionDelay = 1000 / 700.0f;
@@ -377,8 +387,10 @@ int main() {
             catch(nlohmann::json::parse_error& e){
                 cerr << "Parse Error: " << e.what() << endl;
             }
-            int key = stoi(input_object["letter"].get<string>());
-            emulator.keypad[key] = !emulator.keypad[key];
+            if(input_object["type"] == "input"){
+                int key = stoi(input_object["letter"].get<string>());
+                emulator.keypad[key] = !emulator.keypad[key];
+            }
         }
 
         auto currentTime = chrono::high_resolution_clock::now();

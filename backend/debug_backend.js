@@ -21,7 +21,6 @@ web_server.on('connection', (stream) => {
     const emulator = spawn(path.join(__dirname, '/../emulator/chip8.exe'));
 
     emulator.stdout.on('data', (data) => {
-        console.log("Received Data from emulator");
         const output = data.toString();
         //Pipe data to WebsSocket
         stream.send(output);
@@ -40,8 +39,7 @@ web_server.on('connection', (stream) => {
             console.log("Received Data from client through web socket");
             
             //Send Data to Emulator.
-
-            emulator.stdin.write(data, () => {
+            emulator.stdin.write(data + '\n', () => {
                 console.log("Sending Data to Emulator.");
             });
 
