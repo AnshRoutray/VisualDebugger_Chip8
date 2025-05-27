@@ -9,8 +9,44 @@
 <body>
     <h1 id = "title">The CHIP-8 Emulator</h1>
     <div class = "container">
-        <button onclick="accessEmulator()">Start Program</button>
+        <div id = "leftStats">
+            <button id = "StartButton" onclick="accessEmulator()">Start Program</button>
+            <h2 class = "debug">V Registers:</h2> 
+            <div id = "registers-grid">
+                <h4 class = "debug" id = "V0">V0: 0</h4>
+                <h4 class = "debug" id = "V1">V1: 0</h4>
+                <h4 class = "debug" id = "V2">V2: 0</h4>
+                <h4 class = "debug" id = "V3">V3: 0</h4>
+                <h4 class = "debug" id = "V4">V4: 0</h4>
+                <h4 class = "debug" id = "V5">V5: 0</h4>
+                <h4 class = "debug" id = "V6">V6: 0</h4>
+                <h4 class = "debug" id = "V7">V7: 0</h4>
+                <h4 class = "debug" id = "V8">V8: 0</h4>
+                <h4 class = "debug" id = "V9">V9: 0</h4>
+                <h4 class = "debug" id = "V10">Va: 0</h4>
+                <h4 class = "debug" id = "V11">Vb: 0</h4>
+                <h4 class = "debug" id = "V12">Vc: 0</h4>
+                <h4 class = "debug" id = "V13">Vd: 0</h4>
+                <h4 class = "debug" id = "V14">Ve: 0</h4>
+                <h4 class = "debug" id = "V15">Vf: 0</h4>
+            </div>
+        </div>
         <div id = "display"></div>
+    </div>
+    <div class = "debugState">
+        <h2 id = "stack-label" class = "debug">Stack: </h2>
+        <div id = "stack">
+            <h4 class = "debug" id = "s4">0</h4>
+            <h4 class = "debug" id = "s3">0</h4>
+            <h4 class = "debug" id = "s2">0</h4>
+            <h4 class = "debug" id = "s1">0</h4>
+            <h4 class = "debug" id = "s0">0</h4>
+        </div>
+        <h2 id = "pc" class = "debug">Program Counter: 0</h2>
+        <h2 id = "instruction" class = "debug">Instruction: 0</h2>
+        <h2 id = "I-register" class = "debug">I Register: 0</h2> 
+        <h2 id = "dtim" class = "debug">Delay Timer: 0</h2>
+        <h2 id = "stim" class = "debug">Sound Timer: 0</h2>
     </div>
     <script src="client.js"></script>
 </body>

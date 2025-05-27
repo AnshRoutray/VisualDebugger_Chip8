@@ -4,6 +4,8 @@ const http = require('http')
 const { spawn } = require('child_process')
 const WebSocket = require('ws');
 
+let buffer = "";
+
 const server = express()
 const http_server = http.createServer(server)
 const web_server = new WebSocket.Server({server: http_server})
@@ -21,10 +23,17 @@ web_server.on('connection', (stream) => {
     const emulator = spawn(path.join(__dirname, '/../emulator/chip8.exe'));
 
     emulator.stdout.on('data', (data) => {
-        const output = data.toString();
-        //Pipe data to WebsSocket
-        stream.send(output);
-    })
+        buffer += data.toString();           // Accumulate chunks
+        const lines = buffer.split('\n');    // Split by newline
+        buffer = lines.pop();                // Keep last incomplete line
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.length === 0) continue;
+            stream.send(trimmed); 
+            console.log(trimmed);      
+        }
+    });
 
     emulator.stderr.on('data', (data) => {
         console.error("ERROR: " + data);

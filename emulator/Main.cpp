@@ -1,3 +1,6 @@
+//Execute Command - 
+//"g++ -std=c++17 -O2 -pthread -IC:\libs\json-develop\json-develop\include Main.cpp -o chip8"
+
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
@@ -300,6 +303,30 @@ class Chip8 {
             cout << output.dump() << endl << flush;
         }
 
+        void sendDebugInfo(){
+            nlohmann::json debugInfo;
+            nlohmann::json registers = nlohmann::json::array();
+            for(uint8_t i : V){
+                registers.push_back(i);
+            }
+            nlohmann::json stack_obj = nlohmann::json::array();
+            int start = (sp - 5 < 0) ? 0 : sp - 5;
+            for(int i = start; i < sp; i++){
+                stack_obj.push_back(stack[i]);
+            }
+            debugInfo["type"] = "state";
+            debugInfo["V"] = registers;
+            debugInfo["stack"] = stack_obj;
+            debugInfo["pc"] = pc;
+            debugInfo["ins"] = memory[pc] << 8 | memory[pc + 1];
+            debugInfo["dtim"] = delay_timer;
+            debugInfo["stim"] = sound_timer;
+            debugIngo["I"] = I;
+
+            cout << debugInfo.dump() << endl << flush;
+
+        }
+
         const uint8_t fontset[80] = {
             0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
             0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -333,7 +360,7 @@ class Chip8 {
 
 int main() {
 
-    string gamePath = "../emulator/flightrunner.ch8"; // Path to the game file
+    string gamePath = "../emulator/IBM_Logo.ch8"; // Path to the game file
 
     ifstream gameFile(gamePath, ios::binary);
     if (!gameFile) {
@@ -399,6 +426,7 @@ int main() {
 
         if(deltaTime_instruction.count() >= instructionDelay) {
             emulator.emulateCycle(); 
+            emulator.sendDebugInfo();
             lastTime_instruction = currentTime;
         }
 

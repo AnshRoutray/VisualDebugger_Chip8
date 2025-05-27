@@ -71,7 +71,7 @@ function keyEvent(event, mode) {
 }
 
 const pixels = [];
-for(let i = false; i < 2048; i++){
+for(let i = 0; i < 2048; i++){
     const pixel = document.createElement("div");
     pixel.classList.add('pixel');
     grid.appendChild(pixel);
@@ -91,6 +91,13 @@ function accessEmulator(){
         if(parsedData.type === "display"){
             updateDisplay(parsedData.display);
         }
+        else if(parsedData.type === "state"){
+            console.log(parsedData);
+            updateDebugState(parsedData);
+        }
+        else {
+            console.error("Unknown Type of data type received.");
+        }
     }
 }
 
@@ -106,6 +113,33 @@ function updateDisplay(frame){
             pixels[x * 64 + y].style.backgroundColor = "white";
         }
     }
+}
+
+function updateDebugState(data){
+    let V = data.V;
+    let stack = data.stack;
+    let program_counter = data.pc;
+    let instruction = data.ins;
+    let delay_timer = data.dtim;
+    let sound_timer = data.stim;
+    let I_register = data.I;
+    for(let i = 0; i < 16; i++){
+        let reg = document.getElementById("V" + i);
+        reg.innerHTML = "V" + i.toString(16) + ": " + V[i];
+    }
+    for (let i = 0; i < 5; i++) {
+    let st = document.getElementById("s" + i);
+    if (i < stack.length) {
+        st.innerHTML = stack[i].toString(16);
+    } else {
+        st.innerHTML = "0";
+    }
+}
+    document.getElementById("pc").innerHTML = "Program Counter: 0x" + parseInt(program_counter).toString(16);
+    document.getElementById("instruction").innerHTML = "Instruction: 0x" + parseInt(instruction).toString(16);
+    document.getElementById("dtim").innerHTML = "Delay Timer: " + delay_timer;
+    document.getElementById("stim").innerHTML = "Sound Timer: " + sound_timer;
+    document.getElementById("I-register").innerHTML = "I Register: " + I_register.toString(16);
 }
 
 document.addEventListener("keydown", (event) => {

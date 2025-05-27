@@ -1,9 +1,15 @@
+html {
+    overflow-y: hidden;
+}
+
 body {
     background-color: darkblue;
     flex-direction: column;
     display: flex;
     align-items: center;
-    height: 100vh;    
+    min-height: 100vh;
+    margin: 0;
+    padding: 10px;
 }
 
 #title {
@@ -13,8 +19,9 @@ body {
 
 .container {
     display: flex;                  /* Use flexbox to align display and button horizontally */
-    justify-content: flex-start;    /* Align items to the start (left) */
-    align-items: center;            /* Center items vertically */
+    justify-content: space-between;    /* Align items to the start (left) */
+    align-items: center;       /* Center items vertically */
+    gap: 4rem;
 }
 
 #display {
@@ -38,7 +45,52 @@ button {
     background-color: greenyellow;
     border: none;
     color: darkblue;
-    cursor: pointer;
-    position: absolute;             /* Position the button absolutely relative to the container */
-    left: 100px;                    /* 10px from the right edge of the container */
+    cursor: pointer;           /* Position the button absolutely relative to the container */
+    margin-bottom: 3vh;                 /* 10px from the right edge of the container */
+}
+
+.debugState {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
+    gap: 2.5rem;
+    margin-top: 3vw;
+}
+
+.debug {
+    color: red;
+}
+
+#startButton {
+    padding-top: 50px;
+}
+
+#leftStats {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#leftStats h4 {
+    margin-bottom: 0px;
+}
+
+#registers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 60px);
+    grid-template-rows: repeat(4, 30px);
+    gap: 0;
+    width: 240px;
+    height: 120px;
+    margin-right: 10px;  
+    margin-top: 10px;   
+}
+
+#stack {
+    display: grid;
+    grid-template-columns: repeat(1, 10px);
+    grid-template-rows: repeat(16, 25px); 
+    width: 10px;
 }
