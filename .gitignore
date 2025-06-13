@@ -1,6 +1,5 @@
 # Node.js
 backend/node_modules/
-package-lock.json
 
 # Build artifacts
 *.o

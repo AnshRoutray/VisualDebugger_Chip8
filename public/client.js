@@ -80,7 +80,7 @@ for(let i = 0; i < 2048; i++){
 }
 
 function accessEmulator(){
-    ws = new WebSocket("ws:localhost:3000")
+    ws = new WebSocket("ws://localhost:3000")
     ws.onopen = () => {
         console.log("Connections between client and server is established - Client");
     }
