@@ -30,8 +30,7 @@ web_server.on('connection', (stream) => {
         for (const line of lines) {
             const trimmed = line.trim();
             if (trimmed.length === 0) continue;
-            stream.send(trimmed); 
-            console.log(trimmed);      
+            stream.send(trimmed);    
         }
     });
 
@@ -41,6 +40,10 @@ web_server.on('connection', (stream) => {
 
     emulator.on('close', (code) => {
         console.log(`Emulator exited with code ${code}`);
+        if (stream.readyState === WebSocket.OPEN) {
+            console.log("Closing the stream");
+            stream.close(); // Or stream.terminate() for force
+        }
     })
 
     stream.on('message', (data) => {

@@ -1,11 +1,12 @@
 interface ButtonProp {
   children: string;
   onClick: () => void;
+  disabled?: boolean
 }
 
-const Button = ({ children, onClick }: ButtonProp) => {
+const Button = ({ children, onClick, disabled = false}: ButtonProp) => {
   return (
-    <button className="btn btn-primary align-self-center" onClick={onClick}>
+    <button disabled = {disabled} className="btn btn-primary align-self-center" onClick={onClick}>
       {children}
     </button>
   );

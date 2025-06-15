@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "./components/Button";
 import Canvas from "./components/Canvas";
 import { webSocketInit } from "./services/WebSocket";
@@ -96,20 +96,11 @@ function keyEvent(event: React.KeyboardEvent<any>, mode: string) {
 function App() {
   const scale = 10;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  let buttonClick = () => {
-    if (canvasRef.current) {
-      const url = "ws:localhost:3000";
-      ws = webSocketInit(
-        url,
-        canvasRef.current,
-        vRegisterRefs.current,
-        debugRefs.current,
-        stackPointerRefs.current,
-        stackRefs.current,
-        scale
-      );
-    }
-  };
+  let [startStopButtonText, setStartStop] = useState("Start");
+  let [[pauseResumeButtonText, pauseResumeDisabled], setPauseResume] = useState(
+    ["Pause", true]
+  );
+  let [stepDisabled, setStepDisabled] = useState(true);
   const registers = [
     ["V0", "V1", "V2", "V3"],
     ["V4", "V5", "V6", "V7"],
@@ -124,7 +115,110 @@ function App() {
   let debugRefs = useRef<Array<HTMLHeadingElement | null>>([]);
   let stackPointerRefs = useRef<Array<HTMLHeadingElement | null>>([]);
   let stackRefs = useRef<Array<HTMLHeadingElement | null>>([]);
+  let startStopButtonClick = () => {
+    if (canvasRef.current) {
+      if (startStopButtonText === "Start") {
+        const url = "ws:localhost:3000";
+        ws = webSocketInit(
+          url,
+          canvasRef.current,
+          vRegisterRefs.current,
+          debugRefs.current,
+          stackPointerRefs.current,
+          stackRefs.current,
+          scale
+        );
+        setPauseResume(["Pause", false]);
+        setStartStop("Stop");
+      } else {
+        if (ws) {
+          //Stop the Program
+          let message = { type: "state", command: "stop" };
+          ws.send(JSON.stringify(message));
+          ws.close();
+          //Clearing all values and re rendering the container
 
+          //Resetting Canvas
+
+          let canvas = canvasRef.current;
+          if (canvas) {
+            let cxt = canvas.getContext("2d");
+            if (cxt) {
+              cxt.fillStyle = "black";
+              cxt.fillRect(0, 0, 64 * scale, 32 * scale);
+            }
+          }
+
+          // Resetting V Registers
+
+          for (let i = 0; i < 16; i++) {
+            let reg = vRegisterRefs.current[i];
+            console.log("First " + i);
+            if (reg) {
+              console.log("Second " + i);
+              reg.innerHTML = registers[Math.floor(i / 4)][i % 4] + ": 0x0";
+            }
+          }
+
+          //Resetting Debug States
+
+          const debug = debugRefs.current;
+
+          if (debug[0] && debug[1] && debug[2] && debug[3] && debug[4]) {
+            debug[0].innerHTML = "PC: 0x0";
+            debug[1].innerHTML = "Ins: 0x0";
+            debug[2].innerHTML = "I: 0x0";
+            debug[3].innerHTML = "DT: 0";
+            debug[4].innerHTML = "ST: 0";
+          }
+
+          //Changing Stack and Stack Pointers
+
+          const stack = stackRefs.current;
+          const stackPointer = stackPointerRefs.current;
+          for (let i = 0; i < 16; i++) {
+            if (stack[i]) {
+              stack[i]!.innerHTML = "0x0";
+            }
+            if(stackPointer[i]){
+              stackPointer[i]!.innerHTML = (i == 0) ? "^" : "";
+            }
+          }
+
+          //Changing Button States
+
+          pauseResumeDisabled = true;
+          setPauseResume(["Pause", true]);
+          setStartStop("Start");
+          setStepDisabled(true);
+        }
+      }
+    }
+  };
+  let pauseResumeButtonClick = () => {
+    if (ws) {
+      if (pauseResumeButtonText === "Pause") {
+        //Pause the Program
+
+        let message = {type: "state", command: "pause"}
+        ws.send(JSON.stringify(message));
+        setPauseResume(["Resume", false]);
+        setStepDisabled(false);
+      } else {
+        //Resume the Program
+        let message = {type: "state", command: "resume"};
+        ws.send(JSON.stringify(message));
+        setPauseResume(["Pause", false]);
+        setStepDisabled(true);
+      }
+    }
+  };
+  let onStepClicked = () => {
+    if(ws){
+      let message = {type: "state", command: "step"};
+      ws.send(JSON.stringify(message));
+    }
+  };
   useEffect(() => {
     let canvas = canvasRef.current;
     if (canvas) {
@@ -157,7 +251,20 @@ function App() {
           <div className="col-5 mb-2">
             <div className="row">
               <div className="col-sm d-flex justify-content-center">
-                <Button onClick={buttonClick}>Start Program</Button>
+                <Button onClick={startStopButtonClick}>
+                  {startStopButtonText}
+                </Button>
+              </div>
+              <div className="col-sm d-flex justify-content-center">
+                <Button
+                  disabled={pauseResumeDisabled}
+                  onClick={pauseResumeButtonClick}
+                >
+                  {pauseResumeButtonText}
+                </Button>
+              </div>
+              <div className="col-sm d-flex justify-content-center">
+                <Button onClick={onStepClicked} disabled={stepDisabled}>Step</Button>
               </div>
             </div>
             <div className="row">

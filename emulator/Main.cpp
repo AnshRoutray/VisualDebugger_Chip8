@@ -480,7 +480,8 @@ int main()
     auto lastTime_timer = chrono::high_resolution_clock::now();
     float instructionDelay = 1000 / 700.0f;
     float timerDelay = 1000 / 60.0f;
-
+    bool paused = false;
+    int step = 0;
     while (running)
     {
 
@@ -504,6 +505,32 @@ int main()
                 int key = stoi(input_object["letter"].get<string>());
                 emulator.keypad[key] = !emulator.keypad[key];
             }
+            else if(input_object["type"] == "state"){
+                if(input_object["command"] == "stop"){
+                    running = false;
+                }
+                else if(input_object["command"] == "pause"){
+                    paused = true;
+                    step = 0;
+                }
+                else if(input_object["command"] == "resume"){
+                    paused = false;
+                }
+                else if(input_object["command"] == "step"){
+                    emulator.emulateCycle();
+                    if(step == 11){
+                        if(emulator.delay_timer > 0){
+                            emulator.delay_timer--;
+                        }
+                        if(emulator.sound_timer > 0){
+                            emulator.sound_timer--;
+                        }
+                        step = 0;
+                    }
+                    step++;
+                    emulator.sendDebugInfo();
+                }
+            }
         }
 
         auto currentTime = chrono::high_resolution_clock::now();
@@ -512,20 +539,24 @@ int main()
 
         if (deltaTime_instruction.count() >= instructionDelay)
         {
-            emulator.emulateCycle();
-            emulator.sendDebugInfo();
+            if(!paused){
+                emulator.emulateCycle();
+                emulator.sendDebugInfo();
+            }
             lastTime_instruction = currentTime;
         }
 
         if (deltaTime_timer.count() >= timerDelay)
         {
-            if (emulator.delay_timer > 0)
-            {
-                emulator.delay_timer--;
-            }
-            if (emulator.sound_timer > 0)
-            {
-                emulator.sound_timer--;
+            if(!paused){
+                if (emulator.delay_timer > 0)
+                {
+                    emulator.delay_timer--;
+                }
+                if (emulator.sound_timer > 0)
+                {
+                    emulator.sound_timer--;
+                }
             }
             lastTime_timer = currentTime;
         }
