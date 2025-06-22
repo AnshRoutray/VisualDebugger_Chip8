@@ -1,44 +1,36 @@
 # **CHIP 8 Emulator and Debugger**
 
-A custom-built, fully interactive CHIP-8 emulator and visual debugger designed to run CHIP-8 programs while providing a rich interface for inspecting their execution. This project has evolved significantly in both functionality and technology over time, reflecting a deepening understanding of systems programming, emulation, and UI/UX design.
+A custom-built, fully interactive CHIP-8 emulator and visual debugger designed to run CHIP-8 programs while providing an user friendly interface for inspecting their execution. This project uses skills that relate to systems programming, web development, and UI/UX Design.
 
 ## **Phase 1: Foundational Emulator (C++)**
 
-- Focus: Accurate CHIP-8 CPU emulation, memory layout, opcode decoding, and timer logic.
+- Focus: I firstly focused on an accurate CHIP-8 CPU emulation, memory layout, opcode decoding, and timer logic.
 
 - Implemented full instruction set
 
-- Designed modular architecture (CPU, Memory, Interpreter, Debugger)
+- Designed modular architecture (CPU, Memory, Interpreter, Debugger) using OOP
 
 - Supported file I/O for loading .ch8 binaries
 
-- Next, I needed to make sure I knew what was going on with the components while the emulator was running, so I decided to make a debugger.
+- Next, I needed to make sure I knew what was going on with the components i.e the immediate state of the registers/pc/stack while the emulator was running, so I decided to make a debugger.
 
-## **Phase 2: Basic Frontend (Vanilla HTML/CSS/JS)**
+## **Phase 2: Basic Frontend and Backend (Vanilla HTML/CSS/JS, NodeJS)**
 
-Goal: Visualize memory and registers with a simple UI
+- Goal: Visualize memory and registers with a simple UI. Over here I just wanted to see if the communication between my nodejs backend server that contained the C++ emulator, and my frontend.
 
-Limitations: Manual DOM updates became hard to scale, and interface lacked interactivity and was very basic.
+- Limitations: It was UGLY. It was also not scalable to a large extent as most of my code was extrmeley raw with almost no resuability. 
 
-Tools: Vanilla JS + HTML Canvas + CSS Grid
-
-Outcome: Prototype debugger with memory and register display, but lacked responsive updates and component reusability
+- Outcome: I created a nodejs backend server which communicated with the frontend browser via a websocket. The nodejs server would spawn a spearate CHIP 8 Emulator Program for each websocket connection established. My C++ code communicated with the nodejs server through the nlohmann JSON library.
 
 ## **Phase 3: Transition to React**
-
-Technologies:
-
-- Bootstrap CSS for styling
-
-- WebSocket for real-time communication between the C++ backend and React frontend
-
-Improvements:
 
 - Realtime memory/register/state updates
 
 - Step, pause, and breakpoint control through buttons and hotkeys
 
-- Component-based structure made it easy to expand and maintain
+- Component-based structure made it easy to expand and maintain fixing the scalability issue
+
+- Used Bootstrap CSS to make the webpage more user friendly.
 
 ## **Further Updates Needed**
 
