@@ -6,8 +6,6 @@ A custom-built, fully interactive CHIP-8 emulator and visual debugger designed t
 
 - Focus: Accurate CHIP-8 CPU emulation, memory layout, opcode decoding, and timer logic.
 
-- Highlights:
-
 - Implemented full instruction set
 
 - Designed modular architecture (CPU, Memory, Interpreter, Debugger)
