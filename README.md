@@ -1,8 +1,8 @@
-**CHIP 8 Emulator and Debugger**
+# **CHIP 8 Emulator and Debugger**
 
 A custom-built, fully interactive CHIP-8 emulator and visual debugger designed to run CHIP-8 programs while providing a rich interface for inspecting their execution. This project has evolved significantly in both functionality and technology over time, reflecting a deepening understanding of systems programming, emulation, and UI/UX design.
 
-**Phase 1: Foundational Emulator (C++)**
+## **Phase 1: Foundational Emulator (C++)**
 
 - Focus: Accurate CHIP-8 CPU emulation, memory layout, opcode decoding, and timer logic.
 
@@ -16,7 +16,7 @@ A custom-built, fully interactive CHIP-8 emulator and visual debugger designed t
 
 - Next, I needed to make sure I knew what was going on with the components while the emulator was running, so I decided to make a debugger.
 
-**Phase 2: Basic Frontend (Vanilla HTML/CSS/JS)**
+## **Phase 2: Basic Frontend (Vanilla HTML/CSS/JS)**
 
 Goal: Visualize memory and registers with a simple UI
 
@@ -26,7 +26,7 @@ Tools: Vanilla JS + HTML Canvas + CSS Grid
 
 Outcome: Prototype debugger with memory and register display, but lacked responsive updates and component reusability
 
-**Phase 3: Transition to React**
+## **Phase 3: Transition to React**
 
 Technologies:
 
@@ -42,7 +42,7 @@ Improvements:
 
 - Component-based structure made it easy to expand and maintain
 
-**Further Updates Needed**
+## **Further Updates Needed**
 
 - Ensure one can go step by step even without pressing start.
 
