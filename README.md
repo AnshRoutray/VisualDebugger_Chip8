@@ -2,7 +2,7 @@
 
 A custom-built, fully interactive CHIP-8 emulator and visual debugger designed to run CHIP-8 programs while providing an user friendly interface for inspecting their execution. This project uses skills that relate to systems programming, web development, and UI/UX Design.
 
-## **Phase 1: Foundational Emulator (C++)**
+## **Phase 1: Foundational Assembler (C++)**
 
 - Focus: I firstly focused on an accurate CHIP-8 CPU emulation, memory layout, opcode decoding, and timer logic.
 
@@ -39,3 +39,4 @@ A custom-built, fully interactive CHIP-8 emulator and visual debugger designed t
 - Create a custom CHIP 8 file upload system using Axios or something similar.
 
 - Update the UI to make it more aesthetically pleasing.
+
